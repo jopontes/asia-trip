@@ -1,6 +1,7 @@
 // Gera uma <section> de scroll por parada no roteiro.
 const MONTHS_PT = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 const PUBLIC_BASE = import.meta.env.BASE_URL || '/';
+const PHOTO_CACHE_KEY = '20260501';
 
 function shortDate(iso) {
   if (!iso) return '';
@@ -70,7 +71,7 @@ function renderPhotos(stop) {
   if (!stop.photos?.length) return '';
 
   const figures = stop.photos.map((src) => {
-    const photoSrc = publicUrl(src);
+    const photoSrc = withCacheKey(publicUrl(src), PHOTO_CACHE_KEY);
     return `
     <figure class="photo">
       <img src="${photoSrc}" loading="lazy" decoding="async" alt="${stop.name}" data-full="${photoSrc}" data-caption="${stop.name}" />
@@ -86,4 +87,10 @@ function publicUrl(path) {
   const base = PUBLIC_BASE.endsWith('/') ? PUBLIC_BASE : `${PUBLIC_BASE}/`;
   const cleanPath = path.startsWith('/') ? path.slice(1) : path;
   return `${base}${cleanPath}`;
+}
+
+function withCacheKey(url, cacheKey) {
+  if (!cacheKey || url.startsWith('data:')) return url;
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}v=${cacheKey}`;
 }
