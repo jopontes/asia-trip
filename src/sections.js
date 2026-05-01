@@ -1,5 +1,7 @@
 // Gera uma <section> de scroll por parada no roteiro.
 const MONTHS_PT = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const PUBLIC_BASE = import.meta.env.BASE_URL || '/';
+
 function shortDate(iso) {
   if (!iso) return '';
   const [y, m, d] = iso.split('-').map(Number);
@@ -67,11 +69,21 @@ function labelFor(mode) {
 function renderPhotos(stop) {
   if (!stop.photos?.length) return '';
 
-  const figures = stop.photos.map((src) => `
+  const figures = stop.photos.map((src) => {
+    const photoSrc = publicUrl(src);
+    return `
     <figure class="photo">
-      <img src="${src}" loading="lazy" decoding="async" alt="${stop.name}" data-full="${src}" data-caption="${stop.name}" />
+      <img src="${photoSrc}" loading="lazy" decoding="async" alt="${stop.name}" data-full="${photoSrc}" data-caption="${stop.name}" />
     </figure>
-  `).join('');
+  `;
+  }).join('');
 
   return `<div class="photos" aria-label="Fotos de ${stop.name}">${figures}</div>`;
+}
+
+function publicUrl(path) {
+  if (/^(?:[a-z]+:)?\/\//i.test(path) || path.startsWith('data:')) return path;
+  const base = PUBLIC_BASE.endsWith('/') ? PUBLIC_BASE : `${PUBLIC_BASE}/`;
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  return `${base}${cleanPath}`;
 }
