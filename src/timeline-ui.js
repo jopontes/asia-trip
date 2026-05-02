@@ -9,12 +9,14 @@ export function createTimelineUI(stops) {
     const li = document.createElement('li');
     const pct = visible.length === 1 ? 50 : (i / (visible.length - 1)) * 100;
     li.style.top = `${pct}%`;
+    li.style.left = `${pct}%`;
     li.dataset.id = s.id;
     markersEl.appendChild(li);
   });
 
   function update(progress, activeStop) {
-    progressEl.style.height = `${Math.min(100, Math.max(0, progress * 100))}%`;
+    const pct = `${Math.min(100, Math.max(0, progress * 100))}%`;
+    root.style.setProperty('--timeline-progress', pct);
     const items = markersEl.querySelectorAll('li');
     let activeEl = null;
     items.forEach((el) => {
